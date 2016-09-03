@@ -2,8 +2,8 @@ import sys
 import random
 import time
 
-MARKS = [' ','\033[34mx\033[37m','\033[33mo\033[37m']
 
+MARKS = [' ','\033[34mx\033[37m','\033[33mo\033[37m']
 
 
 class Board(object):
@@ -38,20 +38,22 @@ class Player(object):
         self.name = name
         self.id = id
 
+
     def __str__(self):
         return "%s is %s"%(self.name, MARKS[self.id])
+
 
     def place_mark(self, board, pos):
         try:
             pos = int(pos)
         except:
             return False
+
         if pos in range(9) and not board[pos]:
             print "\033[K%s puts a mark at %s" % (self.name, pos)
             board[pos] = self.id
             return True
         else:
-            #print "There's something at (%s,%s) try another position" % (x,y)
             return False
 
 
@@ -62,10 +64,12 @@ def play(board, player1, player2):
     rounds = 1
     won = 0
     while(rounds < 10):
-
         for player in (player1, player2):
 
-            if rounds == 10 : print '\033[8B'; break
+            if rounds == 10 :
+                print '\033[8B';
+                break
+
             print "\nRound %s" % rounds
             while True:
                 #choice = raw_input("%s please enter a position (0-8):" % player.name)
@@ -77,6 +81,7 @@ def play(board, player1, player2):
                     break
 
             print board
+
             # No need to check if anybody won if we are at the start of the game
             if rounds > 3:
                 won = board.is_winner(player.id)
