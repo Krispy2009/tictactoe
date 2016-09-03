@@ -1,10 +1,15 @@
+import sys
 import random
 import time
+
+MARKS = [' ','\033[34mx\033[37m','\033[33mo\033[37m']
+
+
 
 class Board(object):
     def __init__(self):
         self.board = [0]*9
-        self.marks = [' ','x','o']
+        self.marks = MARKS
         self.win_positions = [
             (0,1,2), (3,4,5),(6,7,8), # horizontal
             (0,3,6),(1,4,7),(2,5,8),  # vertical
@@ -34,7 +39,7 @@ class Player(object):
         self.id = id
 
     def __str__(self):
-        return "%s is %s's"%(self.name, [' ', 'x', 'o'][self.id])
+        return "%s is %s"%(self.name, MARKS[self.id])
 
     def place_mark(self, board, pos):
         try:
@@ -42,7 +47,7 @@ class Player(object):
         except:
             return False
         if pos in range(9) and not board[pos]:
-            print "%s puts a mark at %s" % (self.name, pos)
+            print "\033[K%s puts a mark at %s" % (self.name, pos)
             board[pos] = self.id
             return True
         else:
@@ -51,31 +56,38 @@ class Player(object):
 
 
 def play(board, player1, player2):
-    print board.board
-    print player1
-    print player2
+    players_banner = str(player1) + ' | ' + str(player2)
+    print players_banner
+    print '-' * len(players_banner)
     rounds = 1
+    won = 0
     while(rounds < 10):
 
         for player in (player1, player2):
 
-            if rounds == 10 : break
-            print "Round %s:" % rounds
+            if rounds == 10 : print '\033[8B'; break
+            print "\nRound %s" % rounds
             while True:
-                choice = raw_input("%s please enter a position (0-8):" % player.name)
+                #choice = raw_input("%s please enter a position (0-8):" % player.name)
                 #for testing
-                #choice = random.choice(range(9))
+                choice = random.choice(range(9))
                 placed = player.place_mark(board.board,choice)
                 if placed:
                     rounds +=1
                     break
 
-            won = board.is_winner(player.id)
             print board
-            if won:
-                print 'WE HAVE A WINNER!'
-                break
-        if won: 
+            # No need to check if anybody won if we are at the start of the game
+            if rounds > 3:
+                won = board.is_winner(player.id)
+                if won:
+                    print 'WE HAVE A WINNER!'
+                    break
+
+            print '\033[8A'
+            time.sleep(1)
+
+        if won:
             print "%s has won" % player.name
             break
     if not won:
